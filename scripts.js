@@ -1,7 +1,6 @@
 const gameBoard = (function () {
   const gameBoard = [];
   let rows = 3;
-
   let columns = 3;
 
   const createNewGameBoard = function () {
@@ -15,6 +14,18 @@ const gameBoard = (function () {
 
   const getGameBoard = function () {
     return gameBoard;
+  };
+
+  const getRows = function () {
+    return rows;
+  };
+
+  const getColumns = function () {
+    return columns;
+  };
+
+  const getSquareValue = function (row, column) {
+    return gameBoard[i][j];
   };
 
   const checkSquarePlayable = function (row, column) {
@@ -116,6 +127,9 @@ const gameBoard = (function () {
   return {
     createNewGameBoard,
     getGameBoard,
+    getRows,
+    getColumns,
+    getSquareValue,
     checkSquarePlayable,
     playSquare,
     checkWin,
@@ -141,7 +155,9 @@ const game = (function () {
     gameOver = false;
     gameBoard.createNewGameBoard();
     sayRound();
-  }
+
+    displayController.init();
+  };
 
   const sayRound = function () {
     console.log(`Round ${round}. It is ${currentPlayer.name}'s turn.`);
@@ -167,6 +183,7 @@ const game = (function () {
         console.log(`The game has ended in a tie`);
         reset();
       } else {
+        displayController.init();
         switchRound();
       }
     }
@@ -184,6 +201,30 @@ const game = (function () {
   };
 
   return { playRound, reset };
+})();
+
+const displayController = (function () {
+  const boardContainer = document.querySelector("#board-container");
+
+  const init = function () {
+    boardContainer.textContent = "";
+
+    for (i = 0; i < gameBoard.getRows(); i++) {
+      for (j = 0; j < gameBoard.getColumns(); j++) {
+        const newSquare = document.createElement("button");
+        newSquare.setAttribute("class", "square");
+        newSquare.setAttribute("data-row", i);
+        newSquare.setAttribute("data-column", j);
+        newSquare.textContent = gameBoard.getSquareValue(i, j);
+        if (newSquare.textContent !== "") {
+          newSquare.disabled = true;
+        }
+        boardContainer.appendChild(newSquare);
+      }
+    }
+  };
+
+  return { init };
 })();
 
 // // Check Win
@@ -206,13 +247,15 @@ const game = (function () {
 
 // game.playRound();
 
-gameBoard.createNewGameBoard();
-game.playRound(0, 0);
-game.playRound(0, 1);
-game.playRound(0, 2);
-game.playRound(1, 1);
-game.playRound(1, 0);
-game.playRound(1, 2);
-game.playRound(2, 1);
-game.playRound(2, 0);
-game.playRound(2, 2);
+// gameBoard.createNewGameBoard();
+// game.playRound(0, 0);
+// game.playRound(0, 1);
+// game.playRound(0, 2);
+// game.playRound(1, 1);
+// game.playRound(1, 0);
+// game.playRound(1, 2);
+// game.playRound(2, 1);
+// game.playRound(2, 0);
+// game.playRound(2, 2);
+
+game.reset();
