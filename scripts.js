@@ -1,16 +1,19 @@
 const gameBoard = (function () {
   const gameBoard = [];
   let rows = 3;
+
   let columns = 3;
 
-  for (i = 0; i < rows; i++) {
-    gameBoard[i] = [];
-    for (j = 0; j < columns; j++) {
-      gameBoard[i][j] = "";
+  const createNewGameBoard = function () {
+    for (i = 0; i < rows; i++) {
+      gameBoard[i] = [];
+      for (j = 0; j < columns; j++) {
+        gameBoard[i][j] = "";
+      }
     }
-  }
+  };
 
-  const getBoard = function () {
+  const getGameBoard = function () {
     return gameBoard;
   };
 
@@ -25,13 +28,8 @@ const gameBoard = (function () {
   };
 
   const playSquare = function (row, column, mark) {
-    if (checkSquarePlayable(row, column)) {
-      gameBoard[row][column] = mark;
-      console.log(gameBoard);
-      console.log(`Win? ${checkWin()}`);
-      console.log(`Tie? ${checkTie()}`);
-    } else {
-    }
+    gameBoard[row][column] = mark;
+    console.log(gameBoard);
   };
 
   const checkWin = function () {
@@ -115,7 +113,14 @@ const gameBoard = (function () {
     return true;
   };
 
-  return { getBoard, checkSquarePlayable, playSquare, checkWin, checkTie };
+  return {
+    createNewGameBoard,
+    getGameBoard,
+    checkSquarePlayable,
+    playSquare,
+    checkWin,
+    checkTie,
+  };
 })();
 
 function Player(name, mark) {
@@ -128,22 +133,43 @@ const game = (function () {
 
   let round = 1;
   let currentPlayer = player1;
+  let gameOver = false;
+
+  const reset = function () {
+    round = 1;
+    currentPlayer = player1;
+    gameOver = false;
+    gameBoard.createNewGameBoard();
+    sayRound();
+  }
 
   const sayRound = function () {
     console.log(`Round ${round}. It is ${currentPlayer.name}'s turn.`);
     return `Round ${round}. It is ${currentPlayer.name}'s turn.`;
   };
 
-  const refresh = function () {
-    sayRound();
-  };
+  // const refresh = function () {
+  //   sayRound();
+  // };
 
   const playRound = function (row, column) {
     let mark = currentPlayer.mark;
 
-    gameBoard.playSquare(row, column, mark);
+    if (gameBoard.checkSquarePlayable(row, column)) {
+      gameBoard.playSquare(row, column, mark);
 
-    switchRound();
+      if (gameBoard.checkWin()) {
+        gameOver = true;
+        console.log(`${currentPlayer.name} has won!`);
+        reset();
+      } else if (gameBoard.checkTie()) {
+        gameOver = true;
+        console.log(`The game has ended in a tie`);
+        reset();
+      } else {
+        switchRound();
+      }
+    }
   };
 
   const switchRound = function () {
@@ -154,10 +180,10 @@ const game = (function () {
     }
 
     round++;
-    refresh();
+    sayRound();
   };
 
-  return { playRound, refresh };
+  return { playRound, reset };
 })();
 
 // // Check Win
@@ -180,4 +206,13 @@ const game = (function () {
 
 // game.playRound();
 
-// game.refresh();
+gameBoard.createNewGameBoard();
+game.playRound(0, 0);
+game.playRound(0, 1);
+game.playRound(0, 2);
+game.playRound(1, 1);
+game.playRound(1, 0);
+game.playRound(1, 2);
+game.playRound(2, 1);
+game.playRound(2, 0);
+game.playRound(2, 2);
