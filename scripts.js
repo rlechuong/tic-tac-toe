@@ -2,7 +2,6 @@ const gameBoard = (function () {
   const gameBoard = [];
   let rows = 3;
   let columns = 3;
-  let playable = true;
 
   for (i = 0; i < rows; i++) {
     gameBoard[i] = [];
@@ -12,15 +11,27 @@ const gameBoard = (function () {
   }
 
   const getBoard = function () {
-    console.log(gameBoard);
     return gameBoard;
   };
 
+  const checkSquarePlayable = function (row, column) {
+    if (gameBoard[row][column] === "") {
+      console.log(`Valid Square`);
+      return true;
+    } else {
+      console.log(`Invalid Square. Try Again.`);
+      return false;
+    }
+  };
+
   const playSquare = function (row, column, mark) {
-    gameBoard[row][column] = mark;
-    console.log(gameBoard);
-    console.log(`Win? ${checkWin()}`);
-    console.log(`Tie? ${checkTie()}`);
+    if (checkSquarePlayable(row, column)) {
+      gameBoard[row][column] = mark;
+      console.log(gameBoard);
+      console.log(`Win? ${checkWin()}`);
+      console.log(`Tie? ${checkTie()}`);
+    } else {
+    }
   };
 
   const checkWin = function () {
@@ -101,15 +112,10 @@ const gameBoard = (function () {
       }
     }
 
-    if (!checkWin()) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return true;
   };
 
-  return { getBoard, playSquare, checkWin, checkTie };
+  return { getBoard, checkSquarePlayable, playSquare, checkWin, checkTie };
 })();
 
 function Player(name, mark) {
