@@ -2,11 +2,12 @@ const gameBoard = (function () {
   const gameBoard = [];
   let rows = 3;
   let columns = 3;
+  let playable = true;
 
   for (i = 0; i < rows; i++) {
     gameBoard[i] = [];
     for (j = 0; j < columns; j++) {
-      gameBoard[i][j] = `${i}${j}`;
+      gameBoard[i][j] = "";
     }
   }
 
@@ -18,63 +19,72 @@ const gameBoard = (function () {
   const playSquare = function (row, column, mark) {
     gameBoard[row][column] = mark;
     console.log(gameBoard);
-    console.log(this.checkWin());
+    console.log(`Win? ${checkWin()}`);
+    console.log(`Tie? ${checkTie()}`);
   };
 
   const checkWin = function () {
     // First Row
     if (
       gameBoard[0][0] === gameBoard[0][1] &&
-      gameBoard[0][0] === gameBoard[0][2]
+      gameBoard[0][0] === gameBoard[0][2] &&
+      gameBoard[0][0] !== ""
     ) {
       return true;
     }
     // Second Row
     else if (
       gameBoard[1][0] === gameBoard[1][1] &&
-      gameBoard[1][0] === gameBoard[1][2]
+      gameBoard[1][0] === gameBoard[1][2] &&
+      gameBoard[1][0] !== ""
     ) {
       return true;
     }
     // Third Row
     else if (
       gameBoard[2][0] === gameBoard[2][1] &&
-      gameBoard[2][0] === gameBoard[2][2]
+      gameBoard[2][0] === gameBoard[2][2] &&
+      gameBoard[2][0] !== ""
     ) {
       return true;
     }
     // First Column
     else if (
       gameBoard[0][0] === gameBoard[1][0] &&
-      gameBoard[0][0] === gameBoard[2][0]
+      gameBoard[0][0] === gameBoard[2][0] &&
+      gameBoard[0][0] !== ""
     ) {
       return true;
     }
     // Second Column
     else if (
       gameBoard[0][1] === gameBoard[1][1] &&
-      gameBoard[0][1] === gameBoard[2][1]
+      gameBoard[0][1] === gameBoard[2][1] &&
+      gameBoard[0][1] !== ""
     ) {
       return true;
     }
     // Third Column
     else if (
       gameBoard[0][2] === gameBoard[1][2] &&
-      gameBoard[0][2] === gameBoard[2][2]
+      gameBoard[0][2] === gameBoard[2][2] &&
+      gameBoard[0][2] !== ""
     ) {
       return true;
     }
     // Top-Left -> Bottom-Right Diagonal
     else if (
       gameBoard[0][0] === gameBoard[1][1] &&
-      gameBoard[0][0] === gameBoard[2][2]
+      gameBoard[0][0] === gameBoard[2][2] &&
+      gameBoard[0][0] !== ""
     ) {
       return true;
     }
     // Bottom-Left -> Top-Right Diagonal
     else if (
       gameBoard[2][0] === gameBoard[1][1] &&
-      gameBoard[2][0] === gameBoard[0][2]
+      gameBoard[2][0] === gameBoard[0][2] &&
+      gameBoard[2][0] !== ""
     ) {
       return true;
     } else {
@@ -82,23 +92,86 @@ const gameBoard = (function () {
     }
   };
 
-  return { getBoard, playSquare, checkWin };
+  const checkTie = function () {
+    for (i = 0; i < rows; i++) {
+      for (j = 0; j < columns; j++) {
+        if (gameBoard[i][j] === "") {
+          return false;
+        }
+      }
+    }
+
+    if (!checkWin()) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  };
+
+  return { getBoard, playSquare, checkWin, checkTie };
 })();
 
-// function Player(name, mark) {
-//   return { name, mark };
-// }
+function Player(name, mark) {
+  return { name, mark };
+}
 
-// function Game() {
-//   const player1 = Player("Player1", "X");
-//   const player2 = Player("Player2", "O");
+const game = (function () {
+  const player1 = Player("Player1", "X");
+  const player2 = Player("Player2", "O");
 
-//   let turn = 1;
+  let round = 1;
+  let currentPlayer = player1;
 
-//   const playTurn = function () {};
-// }
+  const sayRound = function () {
+    console.log(`Round ${round}. It is ${currentPlayer.name}'s turn.`);
+    return `Round ${round}. It is ${currentPlayer.name}'s turn.`;
+  };
 
-gameBoard.getBoard();
-gameBoard.playSquare(2, 0, "X");
-gameBoard.playSquare(1, 1, "X");
-gameBoard.playSquare(0, 2, "X");
+  const refresh = function () {
+    sayRound();
+  };
+
+  const playRound = function (row, column) {
+    let mark = currentPlayer.mark;
+
+    gameBoard.playSquare(row, column, mark);
+
+    switchRound();
+  };
+
+  const switchRound = function () {
+    if (currentPlayer === player1) {
+      currentPlayer = player2;
+    } else {
+      currentPlayer = player1;
+    }
+
+    round++;
+    refresh();
+  };
+
+  return { playRound, refresh };
+})();
+
+// // Check Win
+// gameBoard.getBoard();
+// gameBoard.playSquare(2, 0, "X");
+// gameBoard.playSquare(1, 1, "X");
+// gameBoard.playSquare(0, 2, "X");
+
+// // Check Tie
+// gameBoard.getBoard();
+// gameBoard.playSquare(0, 0, "X");
+// gameBoard.playSquare(0, 1, "O");
+// gameBoard.playSquare(0, 2, "X");
+// gameBoard.playSquare(1, 0, "O");
+// gameBoard.playSquare(1, 1, "X");
+// gameBoard.playSquare(1, 2, "O");
+// gameBoard.playSquare(2, 0, "X");
+// gameBoard.playSquare(2, 1, "O");
+// gameBoard.playSquare(2, 2, "X");
+
+// game.playRound();
+
+// game.refresh();
