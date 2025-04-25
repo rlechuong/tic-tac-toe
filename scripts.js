@@ -198,6 +198,8 @@ const game = (function () {
 
     round++;
     sayRound();
+    displayController.init();
+    displayController.initiateSquares();
   };
 
   return { playRound, reset };
@@ -224,7 +226,20 @@ const displayController = (function () {
     }
   };
 
-  return { init };
+  const initiateSquares = function () {
+    const squareList = document.querySelectorAll(".square");
+
+    squareList.forEach(function(square) {
+      let row = square.getAttribute("data-row");
+      let column = square.getAttribute("data-column");
+
+      square.addEventListener("click", function() {
+        game.playRound(row, column)
+      });
+    }) 
+  }
+
+  return { init, initiateSquares };
 })();
 
 // // Check Win
