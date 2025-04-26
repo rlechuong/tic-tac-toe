@@ -139,10 +139,9 @@ const gameBoard = (function () {
 })();
 
 function Player(name, mark) {
-
-  const setName = function(newName) {
+  const setName = function (newName) {
     this.name = newName;
-  }
+  };
 
   return { name, mark, setName };
 }
@@ -171,24 +170,31 @@ const game = (function () {
     player2.setName(playerTwoName);
     setStatusMessage();
     displayController.reload();
-  }
+  };
 
   const getStatusMessage = function () {
     console.log(statusMessage);
     return statusMessage;
-  }
+  };
 
   const setStatusMessage = function () {
     if (round === 1 && active === false) {
       statusMessage = `Please enter names.`;
-    }
-    else if (round !==1 && active === false) {
+    } else if (
+      round !== 1 &&
+      active === false &&
+      gameBoard.checkWin() === true
+    ) {
       statusMessage = `Game Over! ${currentPlayer.name} has won!`;
-    }
-    else {
+    } else if (
+      round !== 1 &&
+      active === false &&
+      gameBoard.checkTie() === true
+    ) {
+      statusMessage = `The game has ended in a tie.`;
+    } else {
       statusMessage = `Round ${round}. It is ${currentPlayer.name}'s turn.`;
     }
-
   };
 
   const playRound = function (row, column) {
@@ -204,8 +210,8 @@ const game = (function () {
         displayController.reload();
         displayController.showGameEnd();
       } else if (gameBoard.checkTie()) {
-        active = true;
-        console.log(`The game has ended in a tie`);
+        active = false;
+        console.log(`The game has ended in a tie.`);
         setStatusMessage();
         displayController.reload();
         displayController.showGameEnd();
@@ -233,48 +239,50 @@ const game = (function () {
 const displayController = (function () {
   const boardContainer = document.querySelector("#board-container");
   const resetButton = document.querySelector("#restart-button");
-  const playerNameFormContainer = document.querySelector("#player-name-form-container");
-  const playerNameForm = document.querySelector("#player-name-form")
-  let playerOneName = ""
-  let playerTwoName = ""
-
-  const reload = function () {
-    updateBoard();
-    initiateSquares();
-    updateStatus();
-  };
+  const nameFormContainer = document.querySelector("#name-form-container");
+  const playerNameForm = document.querySelector("#name-form");
+  const restartButton = document.querySelector("#restart-button");
+  let playerOneName = "";
+  let playerTwoName = "";
 
   const showGameStart = function () {
-    playerNameFormContainer.setAttribute("style", "display:block");
+    nameFormContainer.setAttribute("style", "display:block");
     resetButton.setAttribute("style", "display:none");
     updateBoard();
     updateStatus();
     disableBoard();
-  }
+  };
+
+  const reload = function () {
+    nameFormContainer.setAttribute("style", "display:none");
+    updateBoard();
+    clickEventToSquares();
+    updateStatus();
+  };
 
   const showGameEnd = function () {
-    playerNameFormContainer.setAttribute("style", "display:none");
+    nameFormContainer.setAttribute("style", "display:none");
     resetButton.setAttribute("style", "display:block");
     disableBoard();
-  }
+  };
 
   const disableBoard = function () {
     const squareList = document.querySelectorAll(".square");
 
-    squareList.forEach(function(square) {
+    squareList.forEach(function (square) {
       console.log(square);
-      square.disabled=true;
-    })
-  }
+      square.disabled = true;
+    });
+  };
 
-  const enableBoard = function () {
-    const squareList = document.querySelectorAll(".square");
+  // const enableBoard = function () {
+  //   const squareList = document.querySelectorAll(".square");
 
-    squareList.forEach(function(square) {
-      console.log(square);
-      square.disabled=false;
-    })
-  }
+  //   squareList.forEach(function (square) {
+  //     console.log(square);
+  //     square.disabled = false;
+  //   });
+  // };
 
   const updateBoard = function () {
     boardContainer.textContent = "";
@@ -294,10 +302,10 @@ const displayController = (function () {
     }
   };
 
-  const initiateSquares = function () {
+  const clickEventToSquares = function () {
     const squareList = document.querySelectorAll(".square");
 
-      squareList.forEach(function (square) {
+    squareList.forEach(function (square) {
       let row = square.getAttribute("data-row");
       let column = square.getAttribute("data-column");
 
@@ -323,60 +331,29 @@ const displayController = (function () {
       playerOneName = document.querySelector("#player-one-name").value;
       playerTwoName = document.querySelector("#player-two-name").value;
       game.start();
+    } else {
     }
-    else {
-
-    }
-    
-  })
-
-  const restartButton = document.querySelector("#restart-button");
+  });
 
   restartButton.addEventListener("click", () => {
     game.init();
-  })
-
+  });
 
   const getPlayerOneName = function () {
     return playerOneName;
-  }
+  };
 
   const getPlayerTwoName = function () {
     return playerTwoName;
-  }
+  };
 
-  return { reload, enableBoard, showGameStart, showGameEnd, getPlayerOneName, getPlayerTwoName};
+  return {
+    showGameStart,
+    showGameEnd,
+    reload,
+    getPlayerOneName,
+    getPlayerTwoName,
+  };
 })();
-
-// // Check Win
-// gameBoard.getBoard();
-// gameBoard.playSquare(2, 0, "X");
-// gameBoard.playSquare(1, 1, "X");
-// gameBoard.playSquare(0, 2, "X");
-
-// // Check Tie
-// gameBoard.getBoard();
-// gameBoard.playSquare(0, 0, "X");
-// gameBoard.playSquare(0, 1, "O");
-// gameBoard.playSquare(0, 2, "X");
-// gameBoard.playSquare(1, 0, "O");
-// gameBoard.playSquare(1, 1, "X");
-// gameBoard.playSquare(1, 2, "O");
-// gameBoard.playSquare(2, 0, "X");
-// gameBoard.playSquare(2, 1, "O");
-// gameBoard.playSquare(2, 2, "X");
-
-// game.playRound();
-
-// gameBoard.createNewGameBoard();
-// game.playRound(0, 0);
-// game.playRound(0, 1);
-// game.playRound(0, 2);
-// game.playRound(1, 1);
-// game.playRound(1, 0);
-// game.playRound(1, 2);
-// game.playRound(2, 1);
-// game.playRound(2, 0);
-// game.playRound(2, 2);
 
 game.init();
