@@ -67,6 +67,12 @@ h6 {
   isolation: isolate;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 #board-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -74,4 +80,8 @@ h6 {
   width: 25rem;
   height: 25rem;
   font-size: 5rem;
+}
+
+input:invalid {
+  outline: 1px solid red;
 }

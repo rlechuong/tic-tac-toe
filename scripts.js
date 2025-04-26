@@ -2,6 +2,7 @@ const gameBoard = (function () {
   const gameBoard = [];
   let rows = 3;
   let columns = 3;
+  let winningSquares = [];
 
   const createNewGameBoard = function () {
     for (i = 0; i < rows; i++) {
@@ -138,35 +139,57 @@ const gameBoard = (function () {
 })();
 
 function Player(name, mark) {
-  return { name, mark };
+
+  const setName = function(newName) {
+    this.name = newName;
+  }
+
+  return { name, mark, setName };
 }
 
 const game = (function () {
-  const player1 = Player("Player1", "X");
-  const player2 = Player("Player2", "O");
+  let player1 = Player("", "X");
+  let player2 = Player("", "O");
 
   let round = 1;
   let currentPlayer = player1;
-  let gameOver = false;
+  let statusMessage = `Please enter names.`;
+  let active = false;
 
-  const reset = function () {
+  const init = function () {
     round = 1;
-    currentPlayer = player1;
-    gameOver = false;
+    setStatusMessage();
     gameBoard.createNewGameBoard();
-    sayRound();
-
-    displayController.init();
+    displayController.showGameStart();
   };
 
-  const sayRound = function () {
-    console.log(`Round ${round}. It is ${currentPlayer.name}'s turn.`);
-    return `Round ${round}. It is ${currentPlayer.name}'s turn.`;
-  };
+  const start = function () {
+    active = true;
+    let playerOneName = displayController.getPlayerOneName();
+    let playerTwoName = displayController.getPlayerTwoName();
+    player1.setName(playerOneName);
+    player2.setName(playerTwoName);
+    setStatusMessage();
+    displayController.reload();
+  }
 
-  // const refresh = function () {
-  //   sayRound();
-  // };
+  const getStatusMessage = function () {
+    console.log(statusMessage);
+    return statusMessage;
+  }
+
+  const setStatusMessage = function () {
+    if (round === 1 && active === false) {
+      statusMessage = `Please enter names.`;
+    }
+    else if (round !==1 && active === false) {
+      statusMessage = `Game Over! ${currentPlayer.name} has won!`;
+    }
+    else {
+      statusMessage = `Round ${round}. It is ${currentPlayer.name}'s turn.`;
+    }
+
+  };
 
   const playRound = function (row, column) {
     let mark = currentPlayer.mark;
@@ -175,15 +198,18 @@ const game = (function () {
       gameBoard.playSquare(row, column, mark);
 
       if (gameBoard.checkWin()) {
-        gameOver = true;
+        active = false;
         console.log(`${currentPlayer.name} has won!`);
-        reset();
+        setStatusMessage();
+        displayController.reload();
+        displayController.showGameEnd();
       } else if (gameBoard.checkTie()) {
-        gameOver = true;
+        active = true;
         console.log(`The game has ended in a tie`);
-        reset();
+        setStatusMessage();
+        displayController.reload();
+        displayController.showGameEnd();
       } else {
-        displayController.init();
         switchRound();
       }
     }
@@ -197,18 +223,60 @@ const game = (function () {
     }
 
     round++;
-    sayRound();
-    displayController.init();
-    displayController.initiateSquares();
+    setStatusMessage();
+    displayController.reload();
   };
 
-  return { playRound, reset };
+  return { playRound, init, start, getStatusMessage };
 })();
 
 const displayController = (function () {
   const boardContainer = document.querySelector("#board-container");
+  const resetButton = document.querySelector("#restart-button");
+  const playerNameFormContainer = document.querySelector("#player-name-form-container");
+  const playerNameForm = document.querySelector("#player-name-form")
+  let playerOneName = ""
+  let playerTwoName = ""
 
-  const init = function () {
+  const reload = function () {
+    updateBoard();
+    initiateSquares();
+    updateStatus();
+  };
+
+  const showGameStart = function () {
+    playerNameFormContainer.setAttribute("style", "display:block");
+    resetButton.setAttribute("style", "display:none");
+    updateBoard();
+    updateStatus();
+    disableBoard();
+  }
+
+  const showGameEnd = function () {
+    playerNameFormContainer.setAttribute("style", "display:none");
+    resetButton.setAttribute("style", "display:block");
+    disableBoard();
+  }
+
+  const disableBoard = function () {
+    const squareList = document.querySelectorAll(".square");
+
+    squareList.forEach(function(square) {
+      console.log(square);
+      square.disabled=true;
+    })
+  }
+
+  const enableBoard = function () {
+    const squareList = document.querySelectorAll(".square");
+
+    squareList.forEach(function(square) {
+      console.log(square);
+      square.disabled=false;
+    })
+  }
+
+  const updateBoard = function () {
     boardContainer.textContent = "";
 
     for (i = 0; i < gameBoard.getRows(); i++) {
@@ -229,17 +297,55 @@ const displayController = (function () {
   const initiateSquares = function () {
     const squareList = document.querySelectorAll(".square");
 
-    squareList.forEach(function(square) {
+      squareList.forEach(function (square) {
       let row = square.getAttribute("data-row");
       let column = square.getAttribute("data-column");
 
-      square.addEventListener("click", function() {
-        game.playRound(row, column)
+      square.addEventListener("click", function () {
+        game.playRound(row, column);
       });
-    }) 
+    });
+  };
+
+  const updateStatus = function () {
+    const statusContainer = document.querySelector("#status-container");
+
+    statusContainer.textContent = "";
+    statusContainer.textContent = game.getStatusMessage();
+  };
+
+  const startButton = document.querySelector("#start-button");
+
+  startButton.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    if (playerNameForm.reportValidity()) {
+      playerOneName = document.querySelector("#player-one-name").value;
+      playerTwoName = document.querySelector("#player-two-name").value;
+      game.start();
+    }
+    else {
+
+    }
+    
+  })
+
+  const restartButton = document.querySelector("#restart-button");
+
+  restartButton.addEventListener("click", () => {
+    game.init();
+  })
+
+
+  const getPlayerOneName = function () {
+    return playerOneName;
   }
 
-  return { init, initiateSquares };
+  const getPlayerTwoName = function () {
+    return playerTwoName;
+  }
+
+  return { reload, enableBoard, showGameStart, showGameEnd, getPlayerOneName, getPlayerTwoName};
 })();
 
 // // Check Win
@@ -273,4 +379,4 @@ const displayController = (function () {
 // game.playRound(2, 0);
 // game.playRound(2, 2);
 
-game.reset();
+game.init();

@@ -10,6 +10,34 @@
   <body>
     <h1>Tic-Tac-Toe</h1>
 
+    <div id="status-container"></div>
+
     <div id="board-container"></div>
+
+    <div id="player-name-form-container">
+      <form id="player-name-form">
+        <h2>Player Names</h2>
+        <div>
+          <label for="player-one-name">Player 1:</label>
+          <input
+            type="text"
+            id="player-one-name"
+            name="player-one-name"
+            required
+          />
+        </div>
+        <div>
+          <label for="player-two-name">Player 2:</label>
+          <input
+            type="text"
+            id="player-two-name"
+            name="player-two-name"
+            required
+          />
+        </div>
+        <div><button type="submit" id="start-button">Start</button></div>
+      </form>
+    </div>
+    <div><button id="restart-button">Restart</button></div>
   </body>
 </html>
