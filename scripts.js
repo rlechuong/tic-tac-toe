@@ -152,11 +152,12 @@ const game = (function () {
 
   let round = 1;
   let currentPlayer = player1;
-  let statusMessage = `Please enter names.`;
+  let statusMessage = "";
   let active = false;
 
   const init = function () {
     round = 1;
+    currentPlayer = player1;
     setStatusMessage();
     gameBoard.createNewGameBoard();
     displayController.showGameStart();
@@ -179,7 +180,7 @@ const game = (function () {
 
   const setStatusMessage = function () {
     if (round === 1 && active === false) {
-      statusMessage = `Please enter names.`;
+      statusMessage = `Please Enter Names`;
     } else if (
       round !== 1 &&
       active === false &&
@@ -193,7 +194,7 @@ const game = (function () {
     ) {
       statusMessage = `The game has ended in a tie.`;
     } else {
-      statusMessage = `Round ${round}. It is ${currentPlayer.name}'s turn.`;
+      statusMessage = `Move ${round}. It is ${currentPlayer.name}'s (${currentPlayer.mark}) turn.`;
     }
   };
 
@@ -217,6 +218,7 @@ const game = (function () {
         displayController.showGameEnd();
       } else {
         switchRound();
+        displayController.reload();
       }
     }
   };
@@ -230,7 +232,6 @@ const game = (function () {
 
     round++;
     setStatusMessage();
-    displayController.reload();
   };
 
   return { playRound, init, start, getStatusMessage };
