@@ -182,27 +182,33 @@ const gameBoard = (function () {
   };
 })();
 
-function Player(name, mark) {
-  const setName = function (newName) {
-    this.name = newName;
+function createPlayer(mark) {
+  let name = "";
+
+  const getName = function () {
+    return name;
   };
 
-  return { name, mark, setName };
+  const setName = function (newName) {
+    name = newName;
+  };
+
+  return { mark, getName, setName };
 }
 
 const game = (function () {
-  let player1 = Player("", "X");
-  let player2 = Player("", "O");
+  let player1 = createPlayer("X");
+  let player2 = createPlayer("O");
 
   let round = 1;
+  let active = false;
   let currentPlayer = player1;
   let statusMessage = "";
-  let active = false;
 
   const init = function () {
     round = 1;
-    currentPlayer = player1;
     active = false;
+    currentPlayer = player1;
     gameBoard.createNewGameBoard();
     setStatusMessage();
     displayController.showGameStart();
@@ -226,11 +232,13 @@ const game = (function () {
     if (round === 1 && active === false) {
       statusMessage = `Please Enter Names`;
     } else if (round !== 1 && active === false && gameBoard.getWin() === true) {
-      statusMessage = `Game Over! ${currentPlayer.name} has won!`;
+      statusMessage = `Game Over! ${currentPlayer.getName()} has won!`;
     } else if (round !== 1 && active === false && gameBoard.getTie() === true) {
       statusMessage = `The game has ended in a tie.`;
     } else {
-      statusMessage = `Move ${round}. It is ${currentPlayer.name}'s (${currentPlayer.mark}) turn.`;
+      statusMessage = `Move ${round}. It is ${currentPlayer.getName()}'s (${
+        currentPlayer.mark
+      }) turn.`;
     }
   };
 
@@ -272,6 +280,7 @@ const displayController = (function () {
   const resetButton = document.querySelector("#restart-button");
   const nameFormContainer = document.querySelector("#name-form-container");
   const playerNameForm = document.querySelector("#name-form");
+  const startButton = document.querySelector("#start-button");
   const restartButton = document.querySelector("#restart-button");
   let playerOneName = "";
   let playerTwoName = "";
@@ -371,8 +380,6 @@ const displayController = (function () {
     statusContainer.textContent = "";
     statusContainer.textContent = game.getStatusMessage();
   };
-
-  const startButton = document.querySelector("#start-button");
 
   startButton.addEventListener("click", (event) => {
     event.preventDefault();

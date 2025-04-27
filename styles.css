@@ -100,7 +100,7 @@ body {
   gap: 1rem;
 }
 
-#name-form div:nth-last-child(-n+2) {
+#name-form div:nth-last-child(-n + 2) {
   display: grid;
   align-items: center;
   grid-template-columns: 1fr 2fr;
