@@ -88,6 +88,10 @@ body {
   font-size: 5rem;
 }
 
+#restart-button-container {
+  margin-top: 1rem;
+}
+
 #name-form {
   background-color: lightgrey;
   padding: 1rem;
